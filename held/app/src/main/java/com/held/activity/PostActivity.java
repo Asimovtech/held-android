@@ -18,6 +18,7 @@ import com.held.fragment.ChatFragment;
 import com.held.fragment.FeedFragment;
 import com.held.fragment.FriendsListFragment;
 import com.held.fragment.NotificationFragment;
+import com.held.fragment.ParentFragment;
 import com.held.fragment.PostFragment;
 import com.held.fragment.SendFriendRequestFragment;
 import com.held.utils.AppConstants;
@@ -38,6 +39,7 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
     private PreferenceHelper mPreference;
     String callfrom;
     View statusBar;
+    int postCount=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "starting Post activity");
@@ -75,15 +77,24 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
       //  mPostBtn.setOnClickListener(this);
         toolbar.setVisibility(View.GONE);
         Log.i(TAG,"@@Inside post Activity");
-
+        Bundle extras = getIntent().getExtras();
+        if(extras!=null){
+            postCount=extras.getInt("postCount");
+        }
         // todo: this check is not very good. Should check with server whether user has an account
         // and skip to feed
 
-        if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)==true){
+//        if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)==true){
+//            launchCreatePostScreen();
+//        }else if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)) {
+//            launchFeedScreen();
+//        } else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false) {
+//            launchCreatePostScreen();
+//        }
+
+        if(mPreference.readPreference(getString(R.string.is_first_post), false)&&postCount!=0){
             launchCreatePostScreen();
-        }else if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)) {
-            launchFeedScreen();
-        } else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false) {
+        }else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false&&postCount==0) {
             launchCreatePostScreen();
         }
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -101,9 +112,13 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
     }
 
     private void launchCreatePostScreen() {
-        updateToolbar(false, true, false, false, false, false, true, "");
+        ParentFragment frag = PostFragment.newInstance();
+        Bundle bundle=new Bundle();
+        bundle.putInt("postCount",postCount);
+        frag.setArguments(bundle);
+//        updateToolbar(false, true, false, false, false, false, true, "");
         replaceFragment(PostFragment.newInstance(), PostFragment.TAG, false);
-        mDisplayFragment = PostFragment.newInstance();
+        mDisplayFragment = frag;
     }
 
     private void launchNotificationScreen() {
@@ -128,7 +143,10 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(postCount==0)
+            this.finish();
+        else
+            super.onBackPressed();
     }
 
 
@@ -228,13 +246,13 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
                 break;
             case R.id.toolbar_post_btn:
                 break;*/
-            case R.id.back_home:
-                if(mPreference.readPreference(getString(R.string.is_first_post), false)==false){
-                    this.finish();
-                }
-                else
-                    onBackPressed();
-                break;
+//            case R.id.back_home:
+//                if(mPreference.readPreference(getString(R.string.is_first_post), false)==false){
+//                    this.finish();
+//                }
+//                else
+//                    onBackPressed();
+//                break;
         }
     }
 
@@ -247,4 +265,5 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
         // Do something
         finish();
     }
+
 }
