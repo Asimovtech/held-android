@@ -110,7 +110,9 @@ public class PostFragment extends ParentFragment {
         setProfilePic();
         mPostTxt.setVisibility(View.GONE);
 
+
         TextView mTitle = (TextView)view.findViewById(R.id.tv_title);
+
         PreferenceHelper myhelper = PreferenceHelper.getInstance(getCurrActivity());
 
         if (mPrefernce.readPreference(getString(R.string.is_first_post),false)==true)
@@ -256,11 +258,13 @@ public class PostFragment extends ParentFragment {
         Timber.i("End Update Box");
     }
 
+
+
     private void openImageIntent() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getCurrActivity());
         builder.setTitle("Select Source");
-        //builder.setCancelable(false);
+        builder.setCancelable(false);
         CharSequence charSequence[] = {"Camera ", "Gallery"};
         builder.setItems(charSequence,
                 new DialogInterface.OnClickListener() {

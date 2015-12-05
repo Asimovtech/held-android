@@ -132,7 +132,7 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
 
     @Override
     public void onBackPressed() {
-        if(mPreference.readPreference(getString(R.string.is_first_post),false)==true)
+        if(mPreference.readPreference(getString(R.string.is_first_post),false))
             this.finish();
         else
             super.onBackPressed();
