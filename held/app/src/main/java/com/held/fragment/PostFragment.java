@@ -109,13 +109,14 @@ public class PostFragment extends ParentFragment {
         muserProfileUrl=new String();
         setProfilePic();
         mPostTxt.setVisibility(View.GONE);
-        if (postCount == 0)
-            mTitle.setText("Make your first post");
-        else
-            mTitle.setText("Upload photo");
+
         TextView mTitle = (TextView)view.findViewById(R.id.tv_title);
         PreferenceHelper myhelper = PreferenceHelper.getInstance(getCurrActivity());
 
+        if (mPrefernce.readPreference(getString(R.string.is_first_post),false)==true)
+            mTitle.setText("Make your first post");
+        else
+            mTitle.setText("Upload photo");
 
         mTimeLayout=(RelativeLayout)view.findViewById(R.id.time_layout);
         mBackImg.setOnClickListener(this);
@@ -592,7 +593,7 @@ public class PostFragment extends ParentFragment {
                     public void success(SearchUserResponse searchUserResponse, Response response) {
                         Log.i("PostFragment", "@@Image Url" + searchUserResponse.getUser().getProfilePic());
                         muserProfileUrl=searchUserResponse.getUser().getProfilePic();
-                        postCount=Integer.parseInt(searchUserResponse.getUser().getPostCount());
+//                        postCount=Integer.parseInt(searchUserResponse.getUser().getPostCount());
                         if(muserProfileUrl == null)
                             mUserImg.setImageResource(R.drawable.user_icon);
                         else

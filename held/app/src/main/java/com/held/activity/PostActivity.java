@@ -18,7 +18,6 @@ import com.held.fragment.ChatFragment;
 import com.held.fragment.FeedFragment;
 import com.held.fragment.FriendsListFragment;
 import com.held.fragment.NotificationFragment;
-import com.held.fragment.ParentFragment;
 import com.held.fragment.PostFragment;
 import com.held.fragment.SendFriendRequestFragment;
 import com.held.utils.AppConstants;
@@ -77,26 +76,21 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
       //  mPostBtn.setOnClickListener(this);
         toolbar.setVisibility(View.GONE);
         Log.i(TAG,"@@Inside post Activity");
-        Bundle extras = getIntent().getExtras();
-        if(extras!=null){
-            postCount=extras.getInt("postCount");
-        }
+
         // todo: this check is not very good. Should check with server whether user has an account
         // and skip to feed
 
-//        if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)==true){
-//            launchCreatePostScreen();
-//        }else if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)) {
-//            launchFeedScreen();
-//        } else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false) {
-//            launchCreatePostScreen();
-//        }
-
-        if(mPreference.readPreference(getString(R.string.is_first_post), false)&&postCount!=0){
+        if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)==true){
             launchCreatePostScreen();
-        }else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false&&postCount==0) {
+        } else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false) {
             launchCreatePostScreen();
         }
+
+//        if(mPreference.readPreference(getString(R.string.is_first_post), false)&&postCount!=0){
+//            launchCreatePostScreen();
+//        }else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false&&postCount==0) {
+//            launchCreatePostScreen();
+//        }
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     }
@@ -112,13 +106,8 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
     }
 
     private void launchCreatePostScreen() {
-        ParentFragment frag = PostFragment.newInstance();
-        Bundle bundle=new Bundle();
-        bundle.putInt("postCount",postCount);
-        frag.setArguments(bundle);
-//        updateToolbar(false, true, false, false, false, false, true, "");
-        replaceFragment(PostFragment.newInstance(), PostFragment.TAG, false);
-        mDisplayFragment = frag;
+        addFragment(PostFragment.newInstance(), PostFragment.TAG, true);
+        mDisplayFragment = PostFragment.newInstance();
     }
 
     private void launchNotificationScreen() {
@@ -143,7 +132,7 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
 
     @Override
     public void onBackPressed() {
-        if(postCount==0)
+        if(mPreference.readPreference(getString(R.string.is_first_post),false)==true)
             this.finish();
         else
             super.onBackPressed();
