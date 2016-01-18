@@ -112,7 +112,7 @@ public interface HeldAPI {
 
 
    @GET("/users/")
-   void searchByName(@Header("Authorization") String token,@Query("name") String frndName,Callback<Engager> engagerCallback);
+   void searchByName(@Header("Authorization") String token,@Query("query") String frndName,Callback<Engager> engagerCallback);
 
     @PUT("/friendshiprequests/{request_id}/")
     void declineFriend(@Header("Authorization") String token,@Path("request_id")String rid, @Query("decline") String decline,@Query("approve") String approve,@Body()String body ,Callback<DeclineFriendResponse> declineFriendResponseCallback);
