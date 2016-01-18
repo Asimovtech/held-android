@@ -39,6 +39,7 @@ public class SplashActivity extends ParentActivity implements View.OnClickListen
     private PreferenceHelper mPrefernce;
     private String mphoneNo,mPin;
     private final String TAG = "SplashActivity";
+    int postCount=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,10 +132,14 @@ public class SplashActivity extends ParentActivity implements View.OnClickListen
             @Override
             public void success(LoginUserResponse loginUserResponse, Response response) {
                 DialogUtils.stopProgressDialog();
-                Log.i("@@REG KEY in Splash",loginUserResponse.getUser().getRid());
+                Log.i("@@REG KEY in Splash", loginUserResponse.getUser().getRid());
                 mPrefernce.writePreference(getString(R.string.API_session_token), loginUserResponse.getSessionToken());
                 mPrefernce.writePreference(getString(R.string.API_user_regId), loginUserResponse.getUser().getRid());
-                launchFeedActivity();
+                if(mPrefernce.readPreference(getString(R.string.is_first_post),false)==true)
+                    launchPostActivity();
+                else
+                    launchFeedActivity();
+//                checkPostCount();
                 /*if (loginUserResponse.isLogin()) {
                     PreferenceHelper.getInstance(getApplicationContext()).writePreference(getString(R.string.API_session_token), loginUserResponse.getSession_token());
                     callUpdateRegIdApi();
@@ -231,7 +236,7 @@ public class SplashActivity extends ParentActivity implements View.OnClickListen
                 "notification_token", PreferenceHelper.getInstance(this).readPreference(getString(R.string.API_user_regId)), new Callback<SearchUserResponse>() {
                     @Override
                     public void success(SearchUserResponse searchUserResponse, Response response) {
-                        if (mPrefernce.readPreference(getString(R.string.is_first_post), false)==true) {
+                        if (mPrefernce.readPreference(getString(R.string.is_first_post), false) == true) {
                             launchFeedActivity();
                         } else {
                             launchPostActivity();
@@ -248,5 +253,29 @@ public class SplashActivity extends ParentActivity implements View.OnClickListen
                             UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Some Problem Occurred");
                     }
                 });
+    }
+    public void checkPostCount()
+    {
+
+        PreferenceHelper mPrefernce=PreferenceHelper.getInstance(this);
+        HeldService.getService().searchUser(mPrefernce.readPreference(getString(R.string.API_session_token)),
+                mPrefernce.readPreference(getString(R.string.API_user_regId)), new Callback<SearchUserResponse>() {
+                    @Override
+                    public void success(SearchUserResponse searchUserResponse, Response response) {
+                        Log.i("PostFragment", "@@Image Url" + searchUserResponse.getUser().getProfilePic());
+                        //TODO Check Post count
+                        postCount = Integer.parseInt(searchUserResponse.getUser().getPostCount());
+                        if(postCount==0)
+                            launchPostActivity();
+                        else
+                            launchFeedActivity();
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+
+                    }
+                });
+
     }
 }

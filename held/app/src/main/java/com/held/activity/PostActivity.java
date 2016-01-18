@@ -38,6 +38,7 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
     private PreferenceHelper mPreference;
     String callfrom;
     View statusBar;
+    int postCount=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "starting Post activity");
@@ -81,11 +82,15 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
 
         if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)==true){
             launchCreatePostScreen();
-        }else if (callfrom==null && mPreference.readPreference(getString(R.string.is_first_post), false)) {
-            launchFeedScreen();
         } else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false) {
             launchCreatePostScreen();
         }
+
+//        if(mPreference.readPreference(getString(R.string.is_first_post), false)&&postCount!=0){
+//            launchCreatePostScreen();
+//        }else if(mPreference.readPreference(getString(R.string.is_first_post), false)==false&&postCount==0) {
+//            launchCreatePostScreen();
+//        }
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     }
@@ -101,8 +106,7 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
     }
 
     private void launchCreatePostScreen() {
-        updateToolbar(false, true, false, false, false, false, true, "");
-        replaceFragment(PostFragment.newInstance(), PostFragment.TAG, false);
+        addFragment(PostFragment.newInstance(), PostFragment.TAG, true);
         mDisplayFragment = PostFragment.newInstance();
     }
 
@@ -128,7 +132,10 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(mPreference.readPreference(getString(R.string.is_first_post),false))
+            this.finish();
+        else
+            super.onBackPressed();
     }
 
 
@@ -228,13 +235,13 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
                 break;
             case R.id.toolbar_post_btn:
                 break;*/
-            case R.id.back_home:
-                if(mPreference.readPreference(getString(R.string.is_first_post), false)==false){
-                    this.finish();
-                }
-                else
-                    onBackPressed();
-                break;
+//            case R.id.back_home:
+//                if(mPreference.readPreference(getString(R.string.is_first_post), false)==false){
+//                    this.finish();
+//                }
+//                else
+//                    onBackPressed();
+//                break;
         }
     }
 
@@ -247,4 +254,5 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
         // Do something
         finish();
     }
+
 }

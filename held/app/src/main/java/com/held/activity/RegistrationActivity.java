@@ -168,6 +168,25 @@ private TextView mPolicy;
 
     private void validateInput() {
 
+        boolean validate= false;
+        /*if(validateUserName())
+            if(validatePhoneNo())
+                if (validateProfilePic())
+                    validate=true;
+
+        if (validate) {
+            String cc[] = mCountryCodes.getSelectedItem().toString().split(" ");
+            mCountryCode = cc[0];
+            tempCode=mCountryCode;
+            mCountryCode=tempCode.substring(1);
+            if (mNetWorStatus) {
+                DialogUtils.showProgressBar();
+                    callCreateUserApi();
+            } else {
+                UiUtils.showSnackbarToast(findViewById(R.id.root_view), "You are not connected to internet.");
+            }
+
+*/
         if (!TextUtils.isEmpty(mUserNameEdt.getText().toString().trim()))
         {
             if (mUserNameEdt.getText().toString().trim().length() < 6 || mUserNameEdt.getText().toString().trim().length() > 15) {
@@ -212,6 +231,7 @@ private TextView mPolicy;
         if (mFile==null) {
             UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please, select or capture an image for profile picture");
             return;
+
         }
 
         if (mIsNetworkConnected) {
@@ -247,7 +267,7 @@ private TextView mPolicy;
 
                 callUpdateProfileImageApi();
                 Log.i("RegistrationActivity", "Profile PIN" + createUserResponse.toString());
-                callResendSmsApi();
+
             }
 
             @Override
@@ -409,6 +429,7 @@ private TextView mPolicy;
             @Override
             public void success(ProfilPicUpdateResponse profilPicUpdateResponse, Response response) {
                 Timber.i(TAG, "Profile pic updated..");
+                callResendSmsApi();
             }
 
             @Override
@@ -589,20 +610,64 @@ private TextView mPolicy;
 
     }
     void loginValidation(){
+        if(validatePhoneNo())
+            callLoginResendSmsApi();
 
-        if(TextUtils.isEmpty(mPhoneNoEdt.getText().toString())){
-            mPhoneNoEdt.setError("Please enter valid phone no.");
+    }
+    boolean validateUserName(){
+        boolean validate=false;
+        Timber.i("Inside Validate Username");
+        if(TextUtils.isEmpty(mUserNameEdt.getText().toString().trim())){
+            UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please enter valid user name.");
             mUserNameEdt.requestFocus();
+        }
+        else if (!TextUtils.isEmpty(mUserNameEdt.getText().toString().trim()))
+        {
+            if (mUserNameEdt.getText().toString().length() < 6) {
+                UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please enter between 6 to 15 chars.");
+                mUserNameEdt.requestFocus();
+            }
+            else {
+                if (!containsChar(mUserNameEdt.getText().toString())) {
+                    UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please enter Alphabet and digits.");
+                    mUserNameEdt.requestFocus();
+                }
+                else
+                    validate=true;
+            }
+        }
+        return validate;
+    }
+    boolean validatePhoneNo(){
+        boolean validate=false;
+        Timber.i("Inside Validate Phoneno");
+        if(TextUtils.isEmpty(mPhoneNoEdt.getText().toString())){
+            UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please enter valid phone no.");
+            mPhoneNoEdt.requestFocus();
         }
         else if (!TextUtils.isEmpty(mPhoneNoEdt.getText().toString()))
         {
             if(mPhoneNoEdt.getText().toString().trim().length() < 10)
             {
-                mPhoneNoEdt.setError("Please enter valid phone no.");
-                mUserNameEdt.requestFocus();
+                UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please enter valid phone no.");
+                mPhoneNoEdt.requestFocus();
             }
             else
-                callLoginResendSmsApi();
+                validate=true;
+
         }
+        return validate;
+    }
+    boolean validateProfilePic(){
+        boolean validate=false;
+        Timber.i("Inside Validate ProfilePic");
+        if(mFile==null) {
+            Timber.i("Inside Validate check pic ");
+            UiUtils.showSnackbarToast(findViewById(R.id.root_view), "Please, select or capture an image for profile image");
+        }
+        else
+            validate=true;
+
+        return validate;
     }
 }

@@ -69,6 +69,7 @@ public class PostFragment extends ParentFragment {
     private Button mPostBtn;
     private PreferenceHelper mPrefernce;
     private boolean isfromCamera=false;
+    int postCount=0;
 
     public static PostFragment newInstance() {
 
@@ -109,9 +110,15 @@ public class PostFragment extends ParentFragment {
         setProfilePic();
         mPostTxt.setVisibility(View.GONE);
 
+
+        TextView mTitle = (TextView)view.findViewById(R.id.tv_title);
+
         PreferenceHelper myhelper = PreferenceHelper.getInstance(getCurrActivity());
 
-
+        if (mPrefernce.readPreference(getString(R.string.is_first_post),false)==true)
+            mTitle.setText("Make your first post");
+        else
+            mTitle.setText("Upload photo");
 
         mTimeLayout=(RelativeLayout)view.findViewById(R.id.time_layout);
         mBackImg.setOnClickListener(this);
@@ -322,7 +329,7 @@ public class PostFragment extends ParentFragment {
 
             @Override
             public void onCancel(DialogInterface dialog) {
-                launchFeedScreen();
+                getCurrActivity().onBackPressed();
             }
         });
         builder.show();
@@ -590,7 +597,7 @@ public class PostFragment extends ParentFragment {
                     public void success(SearchUserResponse searchUserResponse, Response response) {
                         Log.i("PostFragment", "@@Image Url" + searchUserResponse.getUser().getProfilePic());
                         muserProfileUrl=searchUserResponse.getUser().getProfilePic();
-                        //Log.i(TAG,muserProfileUrl);
+//                        postCount=Integer.parseInt(searchUserResponse.getUser().getPostCount());
                         if(muserProfileUrl == null)
                             mUserImg.setImageResource(R.drawable.user_icon);
                         else
@@ -598,11 +605,6 @@ public class PostFragment extends ParentFragment {
                                 .load(AppConstants.BASE_URL + searchUserResponse.getUser().getProfilePic())
                                 .placeholder(R.drawable.user_icon)
                                 .into(mUserImg);
-                        if (searchUserResponse.getUser().getProfilePic()!=null) {
-                            mTitle.setText(getString(R.string.title_photo_upload));
-                        }else{
-                            mTitle.setText("Make your first post");
-                        }
                     }
 
                     @Override
