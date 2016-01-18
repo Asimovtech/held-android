@@ -21,6 +21,7 @@ import com.held.adapters.SeenByAdapter;
 import com.held.retrofit.HeldService;
 import com.held.retrofit.response.Engager;
 import com.held.retrofit.response.SearchByNameResponce;
+import com.held.retrofit.response.User;
 import com.held.utils.PreferenceHelper;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import timber.log.Timber;
 
 public class SearchActivity extends ParentActivity {
 
@@ -79,10 +81,10 @@ public class SearchActivity extends ParentActivity {
         mPreference=PreferenceHelper.getInstance(this);
         mSearchRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mSearchRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        callSearchByNameApi();
         mSeenByAdapter=new SeenByAdapter(this,mSearchResultList);
         mSearchRecyclerView.setAdapter(mSeenByAdapter);
         mSeenByAdapter.notifyDataSetChanged();
+        callSearchByNameApi();
 
 
         mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
@@ -112,6 +114,7 @@ public class SearchActivity extends ParentActivity {
                         mSearchResultList=searchByNameResponce.getObjects();
 
                         */
+                        User u = engager.getUser();
                         mSearchResultList.clear();
                         mSearchResultList.add(searchResult);
                         mSeenByAdapter.setEngagersList(mSearchResultList);

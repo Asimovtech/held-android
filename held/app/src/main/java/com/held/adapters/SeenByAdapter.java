@@ -81,6 +81,7 @@ public class SeenByAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         String userName = null,img = null;
         String requestStatus =null;
 
+
         Timber.d("on bind viewholder");
         // Timber.d("SeenBy Profile Url"+mEngagersList.get(position).getUser().getProfilePic());
         SeenByViewHolder viewHolder = (SeenByViewHolder) holder;
@@ -138,7 +139,9 @@ public class SeenByAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemCount() {
        //todo: fix later
-        return mEngagersList.size();
+        int count= mEngagersList.size();
+        Timber.d("Engager item count in adapter: " + count);
+        return count;
        // return 1;
 
     }
@@ -147,7 +150,7 @@ public class SeenByAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void setEngagersList(List<Engager> engagersList) {
         //mActivityDataList = activitySeenList;
-        mEngagersList.clear();
+        //mEngagersList.clear();
         mEngagersList=engagersList;
        // mIsLastPage = isLastPage;
         notifyDataSetChanged();
