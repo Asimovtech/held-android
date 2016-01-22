@@ -29,6 +29,7 @@ import com.held.retrofit.response.ProfilPicUpdateResponse;
 import com.held.retrofit.response.SearchUserResponse;
 import com.held.utils.AppConstants;
 import com.held.utils.DialogUtils;
+import com.held.utils.ImageUtils;
 import com.held.utils.PreferenceHelper;
 import com.held.utils.Utils;
 
@@ -366,8 +367,8 @@ public class ProfileActivity extends ParentActivity implements View.OnClickListe
 
         final PreferenceHelper helper = PreferenceHelper.getInstance(this);
         String sessionToken = helper.readPreference(getString(R.string.API_session_token));
-
-
+        String newFpath = ImageUtils.resizeImage(mFile.getPath(), 200);
+        mFile = new File(newFpath);
         HeldService.getService().uploadFile(sessionToken, "", new TypedFile("multipart/form-data", mFile), "", new Callback<PostResponse>() {
             @Override
             public void success(PostResponse postResponse, Response response) {

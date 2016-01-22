@@ -11,6 +11,13 @@ import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
+import timber.log.Timber;
 
 /**
  * Class containing static utility methods for bitmap decoding and scaling
@@ -54,6 +61,86 @@ public class ImageUtils {
         Bitmap unscaledBitmap = BitmapFactory.decodeFile(path, options);
 
         return unscaledBitmap;
+    }
+
+    public static String resizeImage(String path, int maxLength) {
+        String strMyImagePath = null;
+        Bitmap scaledBitmap = null;
+
+        int DESIREDWIDTH = maxLength, DESIREDHEIGHT = maxLength;
+
+
+        try {
+            // Part 1: Decode image
+            Bitmap unscaledBitmap = ImageUtils.decodeFile(path, maxLength, maxLength, ImageUtils.ScalingLogic.FIT);
+            int width = unscaledBitmap.getWidth(); int height = unscaledBitmap.getHeight();
+            Timber.d("image width " + width + " height; " + height);
+
+            if (width >= maxLength || height >= maxLength) {
+                // Part 2: Scale image
+
+                if(width>maxLength && width > height){
+                    // scale width to maxLenght and height accordingly
+                    int diff = width - maxLength;
+                    Timber.d("width is " + diff + " px longer");
+                    float heightDiff =(( (float)diff )/width)*height;
+                    Timber.d("height diff is "+ heightDiff);
+                    DESIREDHEIGHT = height - (int)heightDiff;
+
+                }
+                else{
+                    // scale height to maxLenght and height accordingly
+                    int diff = height - maxLength;
+                    Timber.d("height is " + diff + " px longer");
+                    int widthDiff = (diff/height)*width;
+                    Timber.d("new width diff " + widthDiff);
+                    DESIREDWIDTH = width - widthDiff;
+
+                }
+                Timber.d("scaling image to " + DESIREDWIDTH + " x " + DESIREDHEIGHT);
+                scaledBitmap = ImageUtils.createScaledBitmap(unscaledBitmap, DESIREDWIDTH, DESIREDHEIGHT, ImageUtils.ScalingLogic.FIT);
+            } else {
+                Timber.d("not scaling image");
+                unscaledBitmap.recycle();
+                return path;
+            }
+
+            // Store to tmp file
+
+            String extr = Environment.getExternalStorageDirectory().toString();
+            File mFolder = new File(extr + "/TMMFOLDER");
+            if (!mFolder.exists()) {
+                mFolder.mkdir();
+            }
+
+            String s = "tmp.png";
+
+            File f = new File(mFolder.getAbsolutePath(), s);
+
+            strMyImagePath = f.getAbsolutePath();
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(f);
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+
+                e.printStackTrace();
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+
+            scaledBitmap.recycle();
+        } catch (Throwable e) {
+        }
+
+        if (strMyImagePath == null) {
+            return path;
+        }
+        return strMyImagePath;
+
     }
 
     /**

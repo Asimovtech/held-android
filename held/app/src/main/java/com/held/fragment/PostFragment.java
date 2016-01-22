@@ -38,6 +38,7 @@ import com.held.retrofit.response.ProfilPicUpdateResponse;
 import com.held.retrofit.response.SearchUserResponse;
 import com.held.utils.AppConstants;
 import com.held.utils.DialogUtils;
+import com.held.utils.ImageUtils;
 import com.held.utils.PreferenceHelper;
 import com.held.utils.UiUtils;
 import com.held.utils.Utils;
@@ -462,6 +463,9 @@ public class PostFragment extends ParentFragment {
         final PreferenceHelper helper = PreferenceHelper.getInstance(getCurrActivity());
         String sessionToken = helper.readPreference(getString(R.string.API_session_token));
         Log.i("PostFrgament", "Session token: " + sessionToken);
+
+        String newFpath = ImageUtils.resizeImage(mFile.getPath(), 1080);
+        mFile = new File(newFpath);
 
         HeldService.getService().uploadFile(sessionToken,
                 mCaptionEdt.getText().toString().trim(), new TypedFile("multipart/form-data", mFile), "", new Callback<PostResponse>() {
