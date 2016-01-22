@@ -68,6 +68,7 @@ public class PostFragment extends ParentFragment {
     private Fragment mfragment;
     private GestureDetector mGestureDetector;
     private Button mPostBtn;
+    private Button mSelectImgBtn;
     private PreferenceHelper mPrefernce;
     private boolean isfromCamera=false;
     int postCount=0;
@@ -102,6 +103,7 @@ public class PostFragment extends ParentFragment {
         mPostBtn=(Button)view.findViewById(R.id.post_button);
         mPrefernce=PreferenceHelper.getInstance(getCurrActivity());
         mTitle=(TextView)view.findViewById(R.id.tv_title);
+        mSelectImgBtn=(Button)view.findViewById(R.id.btnSelectImage);
         setTypeFace(mPostBtn,"book");
         setTypeFace(mUserNameTxt,"1");
         setTypeFace(mPostTxt,"book");
@@ -124,6 +126,7 @@ public class PostFragment extends ParentFragment {
         mTimeLayout=(RelativeLayout)view.findViewById(R.id.time_layout);
         mBackImg.setOnClickListener(this);
         mPostBtn.setOnClickListener(this);
+        mSelectImgBtn.setOnClickListener(this);
         mUserNameTxt.setText(PreferenceHelper.getInstance(getCurrActivity()).readPreference("USER_NAME"));
         //mTimeTxt = (TextView) view.findViewById(R.id.box_time_txt);
        // mTimeTxt.setText("Click here to upload Image");
@@ -214,6 +217,9 @@ public class PostFragment extends ParentFragment {
                 mTimeTxt.setVisibility(View.INVISIBLE);
                 //updateBoxUI();
                 break;
+            case R.id.btnSelectImage:
+                openImageIntent();
+                break;
             case R.id.back_home:
                 Intent intent = new Intent(getCurrActivity(),FeedActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -239,12 +245,14 @@ public class PostFragment extends ParentFragment {
         if(isfromCamera){
             mAttachment=BitmapFactory.decodeFile(mFileUri.getPath(),options);
             mPostImg.setImageBitmap(mAttachment);
+            mSelectImgBtn.setVisibility(View.GONE);
 
         }else {
 
             try {
                 mAttachment = MediaStore.Images.Media.getBitmap(getCurrActivity().getContentResolver(),mFileUri);
                 mPostImg.setImageBitmap(mAttachment);
+                mSelectImgBtn.setVisibility(View.GONE);
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

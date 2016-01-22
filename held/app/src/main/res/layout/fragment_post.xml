@@ -56,14 +56,31 @@
         android:letterSpacing=".05"
         />
 </RelativeLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/post_toolbar"
 
         >
-        <include layout="@layout/layout_box"></include>
-    </LinearLayout>
+        <include layout="@layout/layout_box">
+        </include>
+        <Button
+            android:id="@+id/btnSelectImage"
+            android:text="Select Image"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:background="@color/new_btn_color"
+            android:fontFamily="@string/benton_sans_book"
+            android:textAlignment="center"
+            android:letterSpacing=".05"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            />
+    </RelativeLayout>
 
 
     <RelativeLayout
