@@ -33,12 +33,15 @@ import com.held.retrofit.response.CreateUserResponse;
 import com.held.retrofit.response.ProfilPicUpdateResponse;
 import com.held.utils.AppConstants;
 import com.held.utils.DialogUtils;
+import com.held.utils.ImageUtils;
 import com.held.utils.NetworkUtil;
 import com.held.utils.PreferenceHelper;
 import com.held.utils.UiUtils;
 import com.held.utils.Utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -235,7 +238,7 @@ private TextView mPolicy;
         }
 
         if (mIsNetworkConnected) {
-            DialogUtils.showProgressBar();
+            DialogUtils.showDarkProgressBar();
                 callCreateUserApi();
         } else {
             UiUtils.showSnackbarToast(findViewById(R.id.root_view), "You are not connected to internet.");
@@ -251,7 +254,6 @@ private TextView mPolicy;
         HeldService.getService().createUser(mUserNameEdt.getText().toString().trim().toLowerCase(), mCountryCode + mPhoneNoEdt.getText().toString().trim(), "", new Callback<CreateUserResponse>() {
             @Override
             public void success(CreateUserResponse createUserResponse, Response response) {
-                DialogUtils.stopProgressDialog();
                 if (createUserResponse == null) {
                     return;
                 }
@@ -424,16 +426,103 @@ private TextView mPolicy;
         }
         return result;
     }
+
+    private String resizeImage(String path) {
+        String strMyImagePath = null;
+        Bitmap scaledBitmap = null;
+
+        int DESIREDWIDTH = 200, DESIREDHEIGHT = 200, maxLength = 200;
+
+
+        try {
+            // Part 1: Decode image
+            Bitmap unscaledBitmap = ImageUtils.decodeFile(path, maxLength, maxLength, ImageUtils.ScalingLogic.FIT);
+            int width = unscaledBitmap.getWidth(); int height = unscaledBitmap.getHeight();
+            Timber.d("image width "+ width + " height; " + height);
+
+            if (width >= maxLength || height >= maxLength) {
+                // Part 2: Scale image
+
+                if(width>maxLength && width > height){
+                    // scale width to maxLenght and height accordingly
+                    int diff = width - maxLength;
+                    Timber.d("width is " + diff + " px longer");
+                    float heightDiff =(( (float)diff )/width)*height;
+                    Timber.d("height diff is "+ heightDiff);
+                    DESIREDHEIGHT = height - (int)heightDiff;
+
+                }
+                else{
+                    // scale height to maxLenght and height accordingly
+                    int diff = height - maxLength;
+                    Timber.d("height is " + diff + " px longer");
+                    int widthDiff = (diff/height)*width;
+                    Timber.d("new width diff " + widthDiff);
+                    DESIREDWIDTH = width - widthDiff;
+
+                }
+                Timber.d("scaling image to " + DESIREDWIDTH + " x " + DESIREDHEIGHT);
+                scaledBitmap = ImageUtils.createScaledBitmap(unscaledBitmap, DESIREDWIDTH, DESIREDHEIGHT, ImageUtils.ScalingLogic.FIT);
+            } else {
+                Timber.d("not scaling image");
+                unscaledBitmap.recycle();
+                return path;
+            }
+
+            // Store to tmp file
+
+            String extr = Environment.getExternalStorageDirectory().toString();
+            File mFolder = new File(extr + "/TMMFOLDER");
+            if (!mFolder.exists()) {
+                mFolder.mkdir();
+            }
+
+            String s = "tmp.png";
+
+            File f = new File(mFolder.getAbsolutePath(), s);
+
+            strMyImagePath = f.getAbsolutePath();
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(f);
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+
+                e.printStackTrace();
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+
+            scaledBitmap.recycle();
+        } catch (Throwable e) {
+        }
+
+        if (strMyImagePath == null) {
+            return path;
+        }
+        return strMyImagePath;
+
+    }
+
     public void callUpdateProfileImageApi(){
+        Timber.d("Resizing image");
+        String newFpath = resizeImage(mFile.getPath());
+        Timber.d("resize done");
+        mFile = new File(newFpath);
         HeldService.getService().updateProfilePic(mAccessToken, mRegKey, new TypedFile("multipart/form-data", mFile), new Callback<ProfilPicUpdateResponse>() {
             @Override
             public void success(ProfilPicUpdateResponse profilPicUpdateResponse, Response response) {
+                DialogUtils.stopProgressDialog();
                 Timber.i(TAG, "Profile pic updated..");
                 callResendSmsApi();
             }
 
             @Override
             public void failure(RetrofitError error) {
+                DialogUtils.stopProgressDialog();
 
             }
         });
