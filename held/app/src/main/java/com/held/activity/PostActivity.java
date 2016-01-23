@@ -58,6 +58,7 @@ public class PostActivity extends ParentActivity implements View.OnClickListener
             statusBar.setVisibility(View.VISIBLE);
 
         }else {
+            // comm
             statusBar.setVisibility(View.GONE);
         }
         mChat = (ImageView) findViewById(R.id.toolbar_chat_img);
